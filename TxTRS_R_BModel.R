@@ -530,15 +530,14 @@ ReducedFactor <- expand_grid(Age, YOS) %>%
   arrange(YOS) %>% 
   left_join(reduced, by = "Age") %>%
   mutate(norm_retire = ifelse(RetirementType(Age, YOS) %in% c("Normal No Rule of 80", "Normal With Rule of 80"), 1, 0),
-         first_retire = ifelse(RetirementType(Age, YOS) %in% c("Normal No Rule of 80", "Normal With Rule of 80", "Reduced"), Age, 0)
+         first_retire = ifelse(RetirementType(Age, YOS) %in% c("Normal No Rule of 80", "Normal With Rule of 80"), Age, 0)
          ) %>% #remove
   group_by(YOS) %>% 
   mutate(#AgeNormRet = 120 - sum(norm_retire) + 1,     #This is the earliest age of normal retirement given the YOS
          #YearsNormRet = AgeNormRet - Age,
          RetType = RetirementType(Age, YOS),
-         RF = ifelse(RetType == "Reduced" & Age >= ReduceRetAge, Red, 
-                     ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS | RetType == "Reduced" & (Age + YOS >= NormalRetRule), 1 - (AgeRed)*(65-Age), 
-                            ifelse(RetType == "No", 0, 1))),
+         RF = ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS | RetType == "Reduced" & (Age + YOS >= NormalRetRule), 1 - (AgeRed)*(65-Age), 
+                            ifelse(RetType == "Reduced" & Age >= ReduceRetAge, Red, ifelse(RetType == "No", 0, 1))),
          RF = ifelse(RF <0,0,RF)) %>% 
   rename(RetirementAge = Age) %>% 
   select(-Red) %>%
