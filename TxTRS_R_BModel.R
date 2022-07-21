@@ -361,7 +361,7 @@ if(tier == 3){
   SeparationRates <- SeparationRates %>% 
     mutate(retirement_type = RetirementType(Age,YOS),
            
-           SepRateMale = ifelse(retirement_type == "Normal With Rule of 80", Rule90,
+           SepRateMale = ifelse(retirement_type == "Normal With Rule of 80", Rule80,
                                 ifelse(retirement_type == "Normal No Rule of 80", if(employee == "Blend"){NormalMaleBlend}
                                        else if(employee == "Teachers"){NormalMaleTeacher}
                                        else{NormalMaleGeneral},
@@ -375,7 +375,7 @@ if(tier == 3){
                                                      if(employee == "Blend"){TermAfter10BlendMale}
                                                      else if(employee == "Teachers"){TermAfter10TeacherMale}
                                                      else{TermAfter10GeneralMale})))),
-           SepRateFemale = ifelse(retirement_type == "Normal With Rule of 80", Rule90,
+           SepRateFemale = ifelse(retirement_type == "Normal With Rule of 80", Rule80,
                                   ifelse(retirement_type == "Normal No Rule of 80", if(employee == "Blend"){NormalFeMaleBlend}
                                          else if(employee == "Teachers"){NormalFeMaleTeacher}
                                          else{NormalFeMaleGeneral},
