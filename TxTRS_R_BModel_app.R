@@ -98,7 +98,8 @@ TerminationRateBefore10 <- read_excel(FileName, sheet = 'Termination Rates befor
 ################################# Function
 BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
                          ARR.base = ARR, COLA.base = COLA, BenMult.base = BenMult, DC = TRUE, e.age = 27,
-                         DC_EE_cont = DC_EE_cont, DC_ER_cont = DC_ER_cont, DC_return = DC_return){
+                         DB_EE_contr = DB_EE_cont,
+                         DC_EE_contr = DC_EE_cont, DC_ER_contr = DC_ER_cont, DC_return = DC_return){
   ################################# 
   employee <- employee
   tier <- tier
@@ -479,7 +480,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
            #Salary = pmin(Salary_gross, salary_cap),
            # IRSSalaryCap = pmin(Salary,IRSCompLimit),
            FinalAvgSalary = rollmean(lag(Salary), k = ifelse(tier == 3, FinAvgSalaryYears, 3), fill = NA, align = "right"),
-           EEContrib = DB_EE_cont*Salary,
+           EEContrib = DB_EE_contr*Salary,
            DBEEBalance = cumFV(Interest, EEContrib),
            CumulativeWage = cumFV(ARR, Salary)) %>% 
     ungroup()
@@ -765,7 +766,7 @@ palette_reason <- list(Orange="#FF6633",
 ##########
 
 ui <- fluidPage(
-  titlePanel("TxTRS NPV Pension Wealth Accrual (V1.0)"),
+  titlePanel("TxTRS Pension Wealth Accrual (V1.0)"),
   # CODE BELOW: Add select inputs on state and plan_names to choose between different pension plans in Reason database
   theme = shinythemes::shinytheme("spacelab"),
   sidebarLayout(
@@ -776,7 +777,7 @@ ui <- fluidPage(
                  radioGroupButtons("tier", "Employee Class", choices = c(2,3), selected = 3,
                                    status = "primary"),
                  #sliderInput("interest", "Contribution Interest", min = 0.02, max = 0.08, step = 0.005, value = 0.065),
-                 sliderInput("dr", "Discount Rate (%) --------------------------------------------", min = 4.25, max = 8.25, step = 0.25, value = 7),
+                 sliderInput("dr", "Discount Rate (%) --------------------------------------------", min = 4.25, max = 8.25, step = 0.25, value = 7.25),
                  sliderInput("cola", "Cost-of-Living Adjustment (%)", min = 0, max = 2, step = 0.25, value = 0),
                  sliderInput("mult", "Benefit Multiplier (%)", min = 1, max = 2.8, step = 0.1, value = 2.3),
                  sliderInput("DB_EEcontr", "DB EE Contribution (%)", min = 2, max = 12, step = 0.05, value = 8),
@@ -833,9 +834,9 @@ server <- function(input, output, session){
                    ARR.base = input$dr/100, #can set manually
                    COLA.base = input$cola/100, #can set manually
                    BenMult.base = input$mult/100, #can set manually
-                   #DB_EE_cont =  input$DB_EEcontr/100, #can set manually
-                   DC_EE_cont =  input$DC_EEcontr/100, #can set manually
-                   DC_ER_cont = input$DC_ERcontr/100, #can set manually
+                   DB_EE_contr =  input$DB_EEcontr/100, #can set manually
+                   DC_EE_contr =  input$DC_EEcontr/100, #can set manually
+                   DC_ER_contr = input$DC_ERcontr/100, #can set manually
                    DC_return = input$DCreturn/100#can set manually
       )
     )
