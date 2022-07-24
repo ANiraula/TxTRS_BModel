@@ -132,7 +132,7 @@ IsRetirementEligible <- function(Age, YOS, tier = 3){
    ifelse((Age >= NormalRetAgeI & YOS >= NormalYOSI) |
                    (YOS + Age >= NormalRetRule & Age >= NormalRetRuleAge) |
                    (Age >= ReduceRetAge & YOS >= NormalYOSI) |
-                   (YOS >= EarlyRetYOS) |
+                   (YOS >= EarlyRetYOS & YOS >= NormalYOSI) |
                    (YOS + Age >= NormalRetRule), TRUE, FALSE)} else{
    #CLass II legacy rule
    ifelse((Age >= NormalRetAgeII & YOS >= (NormalYOSI-3)) |
@@ -361,8 +361,7 @@ if(tier == 3){
   SeparationRates <- SeparationRates %>% 
     mutate(retirement_type = RetirementType(Age,YOS),
            
-           SepRateMale = ifelse(retirement_type == "Normal With Rule of 80", Rule80,
-                                ifelse(retirement_type == "Normal No Rule of 80", if(employee == "Blend"){NormalMaleBlend}
+           SepRateMale = ifelse(retirement_type %in% c("Normal With Rule of 80", "Normal No Rule of 80"), if(employee == "Blend"){NormalMaleBlend}
                                        else if(employee == "Teachers"){NormalMaleTeacher}
                                        else{NormalMaleGeneral},
                                        ifelse(retirement_type == "Reduced", if(employee == "Blend"){ReducedMaleBlend}
@@ -374,9 +373,8 @@ if(tier == 3){
                                                      else{TermBefore10GeneralMale}, 
                                                      if(employee == "Blend"){TermAfter10BlendMale}
                                                      else if(employee == "Teachers"){TermAfter10TeacherMale}
-                                                     else{TermAfter10GeneralMale})))),
-           SepRateFemale = ifelse(retirement_type == "Normal With Rule of 80", Rule80,
-                                  ifelse(retirement_type == "Normal No Rule of 80", if(employee == "Blend"){NormalFeMaleBlend}
+                                                     else{TermAfter10GeneralMale}))),
+           SepRateFemale = ifelse(retirement_type %in% c( "Normal With Rule of 80", "Normal No Rule of 80"), if(employee == "Blend"){NormalFeMaleBlend}
                                          else if(employee == "Teachers"){NormalFeMaleTeacher}
                                          else{NormalFeMaleGeneral},
                                          ifelse(retirement_type == "Reduced", if(employee == "Blend"){ReducedFeMaleBlend}
@@ -388,7 +386,7 @@ if(tier == 3){
                                                        else{TermBefore10GeneralFeMale}, 
                                                        if(employee == "Blend"){TermAfter10BlendFeMale}
                                                        else if(employee == "Teachers"){TermAfter10TeacherFeMale}
-                                                       else{TermAfter10GeneralFeMale})))),
+                                                       else{TermAfter10GeneralFeMale}))),
            SepRate = ((SepRateMale+SepRateFemale)/2)) %>% 
     group_by(entry_age) %>% 
     mutate(RemainingProb = cumprod(1 - lag(SepRate, default = 0)),
@@ -536,7 +534,7 @@ ReducedFactor <- expand_grid(Age, YOS) %>%
   mutate(#AgeNormRet = 120 - sum(norm_retire) + 1,     #This is the earliest age of normal retirement given the YOS
          #YearsNormRet = AgeNormRet - Age,
          RetType = RetirementType(Age, YOS),
-         RF = ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS | RetType == "Reduced" & (Age + YOS >= NormalRetRule), 1 - (AgeRed)*(65-Age), 
+         RF = ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS | RetType == "Reduced" & (Age + YOS >= NormalRetRule), 1 - (AgeRed)*(62-Age), 
                             ifelse(RetType == "Reduced" & Age >= ReduceRetAge, Red, ifelse(RetType == "No", 0, 1))),
          RF = ifelse(RF <0,0,RF)) %>% 
   rename(RetirementAge = Age) %>% 
