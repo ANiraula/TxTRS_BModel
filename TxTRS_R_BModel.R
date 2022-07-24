@@ -323,7 +323,7 @@ SeparationRates <- expand_grid(Age, YOS) %>%
 
 ### Creating column YearsFurstRetire
 SeparationRates <- SeparationRates %>% 
-  mutate(first_retire = ifelse(RetirementType(Age, YOS) %in% c("Normal No Rule of 80", "Normal With Rule of 80", "Reduced"), Age, 0)) 
+  mutate(first_retire = ifelse(RetirementType(Age, YOS) %in% c("Normal No Rule of 80", "Normal With Rule of 80"), Age, 0)) 
 
 x <- SeparationRates %>% 
   group_by(entry_age) %>%
@@ -481,9 +481,9 @@ SalaryData <- SalaryData %>%
 #Survival Probability and Annuity Factor
 #View(MortalityTable)
 AnnuityF <- function(data = MortalityTable,
-                     ColaType = "Simple"){
+                     ColaType = "Compound"){
   
-  AnnFactorData <- MortalityTable %>% 
+  AnnFactorData <- data %>% 
     select(Age, entry_age, mort) %>%
     group_by(entry_age) %>% 
     mutate(surv = cumprod(1 - lag(mort, default = 0)),
