@@ -774,7 +774,7 @@ ui <- fluidPage(
                  img(src = base64enc::dataURI(file = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/reason_logo.png"), width = 200, height = 50),
                  selectInput("e.age", "Entry Age", choices = c(22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72), selected = 27),
                  selectInput("ee","Employee Type", choices = c("Teachers", "General", "Blend"), selected = "Blend"),
-                 radioGroupButtons("tier", "Employee Class", choices = c(2,3), selected = 3,
+                 radioGroupButtons("tier", "Employee Tier", choices = c(2,3), selected = 3,
                                    status = "primary"),
                  #sliderInput("interest", "Contribution Interest", min = 0.02, max = 0.08, step = 0.005, value = 0.065),
                  sliderInput("dr", "Discount Rate (%) --------------------------------------------", min = 4.25, max = 8.25, step = 0.25, value = 7.25),

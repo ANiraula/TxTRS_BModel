@@ -49,6 +49,10 @@ YOS <- 0:100
 RetirementAge <- 20:120
 Years <- 2015:2121    #Start from Mortality Table + 1 year (RP-2014 + 1 = 2015)
 
+#FileName <- 'NDPERS_BM_Inputs.xlsx'
+FileName <- 'TxTRS_BM_Inputs.xlsx'
+#FileName <- "https://github.com/ANiraula/NDPERS_BModel/blob/main/NDPERS_BM_Inputs.xlsx?raw=true"
+
 #Assigning individual  Variables
 model_inputs <- read_excel(FileName, sheet = 'Main')
 
