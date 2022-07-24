@@ -47,7 +47,7 @@ tier <- 3
 #Early retirement" Either Age 55 + 25 YOS or Age 60
 
 #FileName <- 'NDPERS_BM_Inputs.xlsx'
-FileName <- '/Users/anilniraula/TxTRS_BModel/TxTRS_BM_Inputs.xlsx'
+FileName <- 'TxTRS_BM_Inputs.xlsx'
 #FileName <- "https://github.com/ANiraula/NDPERS_BModel/blob/main/NDPERS_BM_Inputs.xlsx?raw=true"
 
 #urlfile="https://github.com/ANiraula/NDPERS_BModel/blob/main/NDPERS_BM_Inputs.xlsx?raw=true"
@@ -107,9 +107,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
   if(tier == 3){
     RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates')}else{#Updated to SCRS*
       #Class Two members who attain age 65 before attaining 28 years of service
-      RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates Age')
-      #Class Two members who attain 28 years of service
-      RetirementRates2 <- read_excel(FileName, sheet = 'Retirement Rates YOS')
+      RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates')
     }
   #View(TerminationRateBefore10)
   
@@ -767,13 +765,13 @@ palette_reason <- list(Orange="#FF6633",
 ##########
 
 ui <- fluidPage(
-  titlePanel("LASERS NPV Pension Wealth Accrual (V2.0)"),
+  titlePanel("TxTRS NPV Pension Wealth Accrual (V1.0)"),
   # CODE BELOW: Add select inputs on state and plan_names to choose between different pension plans in Reason database
   theme = shinythemes::shinytheme("spacelab"),
   sidebarLayout(
     sidebarPanel(width = 3,
                  img(src = base64enc::dataURI(file = "https://raw.githubusercontent.com/ReasonFoundation/databaseR/master/apps/reason_logo.png"), width = 200, height = 50),
-                 selectInput("e.age", "Entry Age", choices = c(22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72), selected = 37),
+                 selectInput("e.age", "Entry Age", choices = c(22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72), selected = 27),
                  selectInput("ee","Employee Type", choices = c("Teachers", "General", "Blend"), selected = "Blend"),
                  radioGroupButtons("tier", "Employee Class", choices = c(2,3), selected = 3,
                                    status = "primary"),
@@ -794,8 +792,6 @@ ui <- fluidPage(
                  ".shiny-output-error:before { visibility: hidden; }"
       ),
       radioGroupButtons("comp", "DB & DC Components", choices = c("No","Yes"), selected = "No",
-                        status = "primary"),
-      radioGroupButtons("ret", "Actuarial Note Retirement", choices = c("No","Yes"), selected = "No",
                         status = "primary"),
       plotly::plotlyOutput("plot_pwealth"),
       #br(),
@@ -920,8 +916,7 @@ server <- function(input, output, session){
           legend.title = element_text(size = 9, colour = "black", face = "bold"),
           legend.text = element_text(size = 9)
         )+
-        theme(legend.direction = "hotizontal", 
-              legend.box = "bottom")
+        theme(legend.box = "bottom")
     
     
     # ax2 <- list(

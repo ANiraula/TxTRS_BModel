@@ -37,7 +37,7 @@ tier <- 3
 #Early retirement" Either Age 55 + 25 YOS or Age 60
 
 #FileName <- 'NDPERS_BM_Inputs.xlsx'
-FileName <- '/Users/anilniraula/TxTRS_BModel/TxTRS_BM_Inputs.xlsx'
+# FileName <- '/Users/anilniraula/TxTRS_BModel/TxTRS_BM_Inputs.xlsx'
 #FileName <- "https://github.com/ANiraula/NDPERS_BModel/blob/main/NDPERS_BM_Inputs.xlsx?raw=true"
 
 #urlfile="https://github.com/ANiraula/NDPERS_BModel/blob/main/NDPERS_BM_Inputs.xlsx?raw=true"
@@ -94,13 +94,11 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
   tier <- tier
 
 ## Adding YOS & Age retirement tables for Class II
-if(tier == 3){
-RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates')}else{#Updated to SCRS*
-  #Class Two members who attain age 65 before attaining 28 years of service
-  RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates Age')
-  #Class Two members who attain 28 years of service
-  RetirementRates2 <- read_excel(FileName, sheet = 'Retirement Rates YOS')
-}
+  if(tier == 3){
+    RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates')}else{#Updated to SCRS*
+      #Class Two members who attain age 65 before attaining 28 years of service
+      RetirementRates <- read_excel(FileName, sheet = 'Retirement Rates')
+    }
 #View(TerminationRateBefore10)
 
   ### Automate into a package ###
