@@ -87,7 +87,7 @@ TerminationRateBefore10 <- read_excel(FileName, sheet = 'Termination Rates befor
 
 ################################# Function
 BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
-                         ARR = ARR, COLA = COLA, BenMult = BenMult, DC = TRUE, e.age = 27,
+                         ARR.base = ARR, COLA.base = COLA, BenMult.base = BenMult, DC = TRUE, e.age = 27,
                          DC_EE_cont = DC_EE_cont, DC_ER_cont = DC_ER_cont, DC_return = DC_return){
 ################################# 
   employee <- employee
@@ -486,7 +486,7 @@ AnnuityF <- function(data = MortalityTable,
     group_by(entry_age) %>% 
     mutate(surv = cumprod(1 - lag(mort, default = 0)),
            surv_DR = surv/(1+ARR)^(Age - entry_age),
-           surv_DR_COLA = surv_DR * ifelse(ColaType == "Simple", 1+(COLA * (Age - entry_age)), (1+COLA)^(Age - entry_age)),
+           surv_DR_COLA = surv_DR * ifelse(ColaType == "Simple", 1+(COLA.base * (Age - entry_age)), (1+COLA.base)^(Age - entry_age)),
            AnnuityFactor = rev(cumsum(rev(surv_DR_COLA)))/surv_DR_COLA) %>% 
     ungroup()
   
@@ -598,7 +598,7 @@ BenefitsTable <- expand_grid(Age, YOS, RetirementAge) %>%
   rename(surv_DR_ret = surv_DR, AF_Ret = AnnuityFactor) %>% 
   #Rejoin the table to get the surv_DR for the termination age
   left_join(AnnFactorData %>% select(Age, entry_age, surv_DR), by = c("Age", "entry_age")) %>% 
-  mutate(ReducedFactMult = RF*BenMult, 
+  mutate(ReducedFactMult = RF*BenMult.base, 
          AnnFactorAdj = AF_Ret * surv_DR_ret / surv_DR,
          PensionBenefit = ReducedFactMult * FinalAvgSalary*YOS,
          PresentValue = ifelse(Age > RetirementAge, 0, PensionBenefit*AnnFactorAdj))
@@ -624,8 +624,8 @@ SalaryData <- SalaryData %>%
   left_join(SeparationRates, by = c("Age", "YOS")) %>%
   mutate(PenWealth = pmax(DBEEBalance,MaxBenefit),        #Members are assumed to elect the option with the greatest PV between a refund with interest and a deferred benefit
          RealPenWealth = PenWealth/(1 + assum_infl)^YOS,
-         PVPenWealth = PenWealth/(1 + ARR)^YOS * SepProb,
-         PVCumWage = CumulativeWage/(1 + ARR)^YOS * SepProb)
+         PVPenWealth = PenWealth/(1 + ARR.base)^YOS * SepProb,
+         PVCumWage = CumulativeWage/(1 + ARR.base)^YOS * SepProb)
 ####### DC Account Balance 
 #SalaryData1.2 <- SalaryData %>% filter(entry_age ==27 & Age < 81)
 ####### DC Account Balance 
@@ -708,9 +708,9 @@ SalaryData2 <- data.frame(
                                        NCost = FALSE, #(TRUE -- calculates GNC on original SalaryData)
                                        DC = TRUE, #(TRUE -- calculates DC using e.age)
                                        e.age = 27, #for DC
-                                       ARR =  ARR , #can set manually
-                                       COLA = COLA, #can set manually
-                                       BenMult = BenMult , #can set manually
+                                       ARR.base =  ARR , #can set manually
+                                       COLA.base = COLA, #can set manually
+                                       BenMult.base = BenMult , #can set manually
                                        DC_EE_cont =  0.08, #can set manually
                                        DC_ER_cont = 0.06, #can set manually
                                        DC_return = 0.06)
