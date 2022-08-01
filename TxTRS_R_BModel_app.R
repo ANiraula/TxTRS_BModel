@@ -141,7 +141,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
       ifelse((Age >= NormalRetAgeI & YOS >= NormalYOSI) |
                (YOS + Age >= NormalRetRule & Age >= NormalRetRuleAge) |
                (Age >= ReduceRetAge & YOS >= NormalYOSI) |
-               (YOS >= EarlyRetYOS & YOS >= NormalYOSI) |
+               (YOS >= EarlyRetYOS) |
                (YOS + Age >= NormalRetRule), TRUE, FALSE)} else{
                  #CLass II legacy rule
                  ifelse((Age >= NormalRetAgeII & YOS >= (NormalYOSI-3)) |
@@ -168,7 +168,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
       ifelse((Age >= NormalRetAgeI & YOS >= NormalYOSI), "Normal No Rule of 80",
              ifelse((YOS + Age >= NormalRetRule & Age >= 62 & YOS >= NormalYOSI), "Normal With Rule of 80",
                     ifelse((Age >= ReduceRetAge & YOS >= NormalYOSI) | 
-                             (YOS >= EarlyRetYOS & YOS >= NormalYOSI)  | 
+                             (YOS >= EarlyRetYOS)  | 
                              (YOS + Age >= NormalRetRule & YOS >= NormalYOSI), "Reduced","No")))}
     #https://www.trs.texas.gov/TRS%20Documents/benefits-tier-guide.pdf
     
@@ -495,7 +495,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
       group_by(entry_age) %>% 
       mutate(surv = cumprod(1 - lag(mort, default = 0)),
              surv_DR = surv/(1+ARR)^(Age - entry_age),
-             surv_DR_COLA = surv_DR * ifelse(ColaType == "Simple", 1+(COLA.base * (Age - entry_age)), (1+COLA.base)^(Age - entry_age)),
+             surv_DR_COLA = surv_DR * (1+COLA.base)^(Age - entry_age),
              AnnuityFactor = rev(cumsum(rev(surv_DR_COLA)))/surv_DR_COLA) %>% 
       ungroup()
     
@@ -505,7 +505,8 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
   
   AnnFactorData <- AnnuityF(data = MortalityTable,
                             ColaType = "Compound")
-  #View(AnnFactorData)
+  
+  #View( AnnFactorData)
   ### Implement $500 cap?
   
   
@@ -543,7 +544,7 @@ BenefitModel <- function(employee = "Blend", tier = 3, NCost = FALSE,
     mutate(#AgeNormRet = 120 - sum(norm_retire) + 1,     #This is the earliest age of normal retirement given the YOS
       #YearsNormRet = AgeNormRet - Age,
       RetType = RetirementType(Age, YOS),
-      RF = ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS | RetType == "Reduced" & (Age + YOS >= NormalRetRule), 1 - (AgeRed)*(62-Age), 
+      RF = ifelse(RetType == "Reduced" & YOS >= EarlyRetYOS & Age <= 62 | RetType == "Reduced" & (Age + YOS >= NormalRetRule) & Age <= 62 , 1 - (AgeRed)*(62-Age), 
                   ifelse(RetType == "Reduced" & Age >= ReduceRetAge, Red, ifelse(RetType == "No", 0, 1))),
       RF = ifelse(RF <0,0,RF)) %>% 
     rename(RetirementAge = Age) %>% 

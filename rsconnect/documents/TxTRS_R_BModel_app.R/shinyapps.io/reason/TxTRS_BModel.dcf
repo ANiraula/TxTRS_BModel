@@ -5,9 +5,9 @@ account: reason
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6685468
-bundleId: 6128429
+bundleId: 6153501
 url: https://reason.shinyapps.io/TxTRS_BModel/
-when: 1658695504.1193
+when: 1659360405.56923
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .RData|~$TxTRS_BM_Inputs.xlsx|README.md|TxTRS_R_BModel.R
+ignoredFiles: .RData|README.md|TxTRS_R_BModel.R
